@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome file</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><p>Here is the efficient, concise SQL solution for the assignment.</p>
+<p><strong>Note:</strong> Syntax is written in standard SQL (compatible with MySQL/PostgreSQL).</p>
+<h3 id="q1-university-database"><strong>Q1: University Database</strong></h3>
+<p><em>Concepts: Defaults, Checks, Composite Primary Key.</em></p>
+<pre class=" language-sql"><code class="prism  language-sql"><span class="token comment">-- 1. Create Tables</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Student <span class="token punctuation">(</span>
+    RollNo <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    Name <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+    AdmissionDate <span class="token keyword">DATE</span> <span class="token keyword">DEFAULT</span> <span class="token punctuation">(</span><span class="token keyword">CURRENT_DATE</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token keyword">Status</span> <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token string">'Active'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Course <span class="token punctuation">(</span>
+    CourseID <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    Credits <span class="token keyword">INT</span> <span class="token keyword">CHECK</span> <span class="token punctuation">(</span>Credits <span class="token operator">BETWEEN</span> <span class="token number">1</span> <span class="token operator">AND</span> <span class="token number">5</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Enrollment <span class="token punctuation">(</span>
+    RollNo <span class="token keyword">INT</span><span class="token punctuation">,</span>
+    CourseID <span class="token keyword">INT</span><span class="token punctuation">,</span>
+    <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>RollNo<span class="token punctuation">,</span> CourseID<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">-- Composite Primary Key</span>
+    <span class="token keyword">FOREIGN</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>RollNo<span class="token punctuation">)</span> <span class="token keyword">REFERENCES</span> Student<span class="token punctuation">(</span>RollNo<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token keyword">FOREIGN</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>CourseID<span class="token punctuation">)</span> <span class="token keyword">REFERENCES</span> Course<span class="token punctuation">(</span>CourseID<span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- 3. Insert Sample Data</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Student <span class="token punctuation">(</span>RollNo<span class="token punctuation">,</span> Name<span class="token punctuation">)</span> <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'John Doe'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">-- Uses defaults</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Course <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Enrollment <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- 4. Verify Constraints (These will ERROR)</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Student <span class="token punctuation">(</span>RollNo<span class="token punctuation">,</span> Name<span class="token punctuation">)</span> <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token boolean">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">-- Fails: Name is NULL</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Course <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">102</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">-- Fails: Credits &gt; 5</span>
+</code></pre>
+<hr>
+<h3 id="q2-banking-system"><strong>Q2: Banking System</strong></h3>
+<p><em>Concepts: On Delete Cascade, Check, Default.</em></p>
+<pre class=" language-sql"><code class="prism  language-sql"><span class="token comment">-- 1. Create Tables</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Account <span class="token punctuation">(</span>
+    AccountNumber <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    Balance <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">CHECK</span> <span class="token punctuation">(</span>Balance <span class="token operator">&gt;=</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    AccountType <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token string">'Savings'</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> <span class="token keyword">Transaction</span> <span class="token punctuation">(</span>
+    TransID <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    AccountNumber <span class="token keyword">INT</span><span class="token punctuation">,</span>
+    TransTime <span class="token keyword">TIMESTAMP</span> <span class="token keyword">DEFAULT</span> <span class="token keyword">CURRENT_TIMESTAMP</span><span class="token punctuation">,</span>
+    Amount <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">CHECK</span> <span class="token punctuation">(</span>Amount <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">-- Disallow negative</span>
+    <span class="token keyword">FOREIGN</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>AccountNumber<span class="token punctuation">)</span> <span class="token keyword">REFERENCES</span> Account<span class="token punctuation">(</span>AccountNumber<span class="token punctuation">)</span> 
+    <span class="token keyword">ON</span> <span class="token keyword">DELETE</span> <span class="token keyword">CASCADE</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- 2. Demonstrate ON DELETE CASCADE</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Account <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1001</span><span class="token punctuation">,</span> <span class="token number">5000.00</span><span class="token punctuation">,</span> <span class="token string">'Savings'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> <span class="token keyword">Transaction</span> <span class="token punctuation">(</span>TransID<span class="token punctuation">,</span> AccountNumber<span class="token punctuation">,</span> Amount<span class="token punctuation">)</span> <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1001</span><span class="token punctuation">,</span> <span class="token number">500.00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">DELETE</span> <span class="token keyword">FROM</span> Account <span class="token keyword">WHERE</span> AccountNumber <span class="token operator">=</span> <span class="token number">1001</span><span class="token punctuation">;</span> 
+<span class="token comment">-- Result: The Transaction row for 1001 is automatically deleted.</span>
+
+<span class="token comment">-- 3. Invalid Transactions (ERROR)</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Account <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1002</span><span class="token punctuation">,</span> <span class="token number">500.00</span><span class="token punctuation">,</span> <span class="token string">'Current'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">-- Fails: Balance &lt; 1000</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> <span class="token keyword">Transaction</span> <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1002</span><span class="token punctuation">,</span> <span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">-- Fails: Negative Amount</span>
+</code></pre>
+<hr>
+<h3 id="q3-enterprise-database"><strong>Q3: Enterprise Database</strong></h3>
+<p><em>Concepts: Foreign Key Restrict, Salary Check.</em></p>
+<pre class=" language-sql"><code class="prism  language-sql"><span class="token comment">-- 1. Create Tables</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Department <span class="token punctuation">(</span>
+    DeptID <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    DeptName <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Employee <span class="token punctuation">(</span>
+    EmpID <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    DeptID <span class="token keyword">INT</span><span class="token punctuation">,</span>
+    Salary <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">CHECK</span> <span class="token punctuation">(</span>Salary <span class="token operator">&gt;</span> <span class="token number">15000</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token keyword">Status</span> <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span> <span class="token keyword">DEFAULT</span> <span class="token string">'Working'</span><span class="token punctuation">,</span>
+    <span class="token keyword">FOREIGN</span> <span class="token keyword">KEY</span> <span class="token punctuation">(</span>DeptID<span class="token punctuation">)</span> <span class="token keyword">REFERENCES</span> Department<span class="token punctuation">(</span>DeptID<span class="token punctuation">)</span> 
+    <span class="token keyword">ON</span> <span class="token keyword">DELETE</span> <span class="token keyword">RESTRICT</span> <span class="token comment">-- Prevents deletion if employee exists</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- 3. Show Failed DELETE</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Department <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'HR'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Employee <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">101</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">20000</span><span class="token punctuation">,</span> <span class="token keyword">DEFAULT</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">DELETE</span> <span class="token keyword">FROM</span> Department <span class="token keyword">WHERE</span> DeptID <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> 
+<span class="token comment">-- Result: ERROR - Cannot delete or update a parent row: foreign key constraint fails.</span>
+</code></pre>
+<hr>
+<h3 id="q4-e-commerce-database"><strong>Q4: E-Commerce Database</strong></h3>
+<p><em>Concepts: Defaults, referencing valid customers.</em></p>
+<pre class=" language-sql"><code class="prism  language-sql"><span class="token comment">-- 1. Create Tables</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Customer <span class="token punctuation">(</span>CustID <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span> Name <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">-- Prerequisite</span>
+
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Product <span class="token punctuation">(</span>
+    ProductID <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    Price <span class="token keyword">DECIMAL</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span> <span class="token keyword">CHECK</span> <span class="token punctuation">(</span>Price <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Quantity <span class="token keyword">INT</span> <span class="token keyword">DEFAULT</span> <span class="token number">0</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> Orders <span class="token punctuation">(</span>
+    OrderID <span class="token keyword">INT</span> <span class="token keyword">PRIMARY</span> <span class="token keyword">KEY</span><span class="token punctuation">,</span>
+    CustID <span class="token keyword">INT</span> <span class="token keyword">REFERENCES</span> Customer<span class="token punctuation">(</span>CustID<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    OrderDate <span class="token keyword">DATE</span> <span class="token keyword">DEFAULT</span> <span class="token punctuation">(</span><span class="token keyword">CURRENT_DATE</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- 2 &amp; 3. Prove DEFAULT Constraint</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Customer <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">'Alice'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> Orders <span class="token punctuation">(</span>OrderID<span class="token punctuation">,</span> CustID<span class="token punctuation">)</span> <span class="token keyword">VALUES</span> <span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+<span class="token comment">-- Note: OrderDate was omitted.</span>
+<span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> Orders<span class="token punctuation">;</span> 
+<span class="token comment">-- Result: OrderDate column contains today's date automatically.</span>
+</code></pre>
+<hr>
+<h3 id="q5-alter-table-employee"><strong>Q5: Alter Table Employee</strong></h3>
+<p><em>Concepts: ALTER ADD/DROP constraints.</em></p>
+<pre class=" language-sql"><code class="prism  language-sql"><span class="token comment">-- 1. Add NOT NULL to Name</span>
+<span class="token keyword">ALTER</span> <span class="token keyword">TABLE</span> Employee <span class="token keyword">MODIFY</span> Name <span class="token keyword">VARCHAR</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span><span class="token punctuation">;</span> 
+<span class="token comment">-- (SQL Server: ALTER COLUMN Name VARCHAR(50) NOT NULL)</span>
+
+<span class="token comment">-- 2. Add DEFAULT salary</span>
+<span class="token keyword">ALTER</span> <span class="token keyword">TABLE</span> Employee <span class="token keyword">ALTER</span> <span class="token keyword">COLUMN</span> Salary <span class="token keyword">SET</span> <span class="token keyword">DEFAULT</span> <span class="token number">25000</span><span class="token punctuation">;</span>
+<span class="token comment">-- (SQL Server: ADD CONSTRAINT DF_Sal DEFAULT 25000 FOR Salary)</span>
+
+<span class="token comment">-- 3. Add CHECK constraint</span>
+<span class="token keyword">ALTER</span> <span class="token keyword">TABLE</span> Employee <span class="token keyword">ADD</span> <span class="token keyword">CONSTRAINT</span> CHK_Sal <span class="token keyword">CHECK</span> <span class="token punctuation">(</span>Salary <span class="token operator">&gt;=</span> <span class="token number">20000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">-- 4. Remove DEFAULT constraint</span>
+<span class="token keyword">ALTER</span> <span class="token keyword">TABLE</span> Employee <span class="token keyword">ALTER</span> <span class="token keyword">COLUMN</span> Salary <span class="token keyword">DROP</span> <span class="token keyword">DEFAULT</span><span class="token punctuation">;</span>
+<span class="token comment">-- (SQL Server: ALTER TABLE Employee DROP CONSTRAINT DF_Sal)</span>
+
+<span class="token comment">-- 5. Show Description</span>
+<span class="token keyword">DESC</span> Employee<span class="token punctuation">;</span> 
+<span class="token comment">-- (SQL Server: EXEC sp_help 'Employee')</span>
+</code></pre>
+</div>
+</body>
+
+</html>
